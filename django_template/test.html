@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Student Management System</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Student Management System</h2>
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control" id="name" />
+      </div>
+      <div class="form-group">
+        <label for="age">Age:</label>
+        <input type="number" class="form-control" id="description" />
+      </div>
+      <button type="submit" class="btn btn-primary" onclick="addStudent()">
+        Add Student
+      </button>
+      <br /><br />
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="student-table"></tbody>
+      </table>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+      const MY_SERVER = "https://dj-temp-test-dep.onrender.com/mprint/";
+      //   const MY_SERVER = "http://127.0.0.1:8000/mprint/";
+      function getStudents() {
+        axios
+          .get(MY_SERVER)
+          .then((response) => {
+            const students = response.data;
+            const studentTable = document.getElementById("student-table");
+            studentTable.innerHTML = "";
+
+            students.forEach((student) => {
+              const row = `<tr>
+                        <td>${student.id}</td>
+                        <td>${student.print_name}</td>
+                        <td>${student.desc}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="editStudent(${student.id})">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteStudent(${student.id})">Delete</button>
+                        </td>
+                    </tr>`;
+              studentTable.innerHTML += row;
+            });
+          })
+          .catch((error) => console.log(error));
+      }
+
+      function addStudent() {
+        const name = document.getElementById("name").value;
+        const description = document.getElementById("description").value;
+
+        axios
+          .post(MY_SERVER, {
+            print_name: "html post",
+            desc: "Tdesssscred.",
+            price: 43,
+            info: "innnn",
+            color: "blue",
+          })
+          .then((response) => {
+            console.log(response.data);
+            getStudents();
+            document.getElementById("name").value = "";
+            document.getElementById("description").value = "";
+          })
+          .catch((error) => console.log(error));
+      }
+
+      function deleteStudent(id) {
+        axios
+          .delete(`${MY_SERVER}${"/"}${id}`)
+          .then((response) => {
+            console.log(response.data);
+            getStudents();
+          })
+          .catch((error) => console.log(error));
+      }
+
+      function editStudent(id) {
+        const name = prompt("Enter new name");
+        const age = prompt("Enter new age");
+
+        axios
+          .put(`${MY_SERVER}${"/"}${id}`, {
+            name: name,
+            age: age,
+          })
+          .then((response) => {
+            console.log(response.data);
+            getStudents();
+          })
+          .catch((error) => console.log(error));
+      }
+
+      getStudents();
+    </script>
+  </body>
+</html>
